@@ -3,6 +3,7 @@ const { ipcRenderer, webFrame } = require("electron");
 const ENGINE_HOOK_SOURCE = __ENGINE_HOOK_SOURCE__;
 const REQUEST_EVENT = "tyrano-translator:translate-request";
 const RESPONSE_EVENT = "tyrano-translator:translate-response";
+const DOCUMENT_ID = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 let lastNotice = "";
 
 function showNotice(message) {
@@ -43,9 +44,12 @@ document.addEventListener(REQUEST_EVENT, async (event) => {
   try {
     const result = await ipcRenderer.invoke("translator:translate", {
       text: detail.text,
+      speaker: typeof detail.speaker === "string" ? detail.speaker : "",
+      documentId: DOCUMENT_ID,
       pageUrl: location.href
     });
     if (result?.error) showNotice(result.error);
+    if (result?.warning) showNotice(result.warning);
     document.dispatchEvent(new CustomEvent(RESPONSE_EVENT, {
       detail: {
         id: detail.id,
@@ -53,6 +57,7 @@ document.addEventListener(REQUEST_EVENT, async (event) => {
         translation: result?.translation,
         displayMode: result?.displayMode,
         rubyPosition: result?.rubyPosition,
+        problems: result?.problems,
         error: result?.error
       }
     }));
@@ -68,4 +73,3 @@ document.addEventListener(REQUEST_EVENT, async (event) => {
 webFrame.executeJavaScript(ENGINE_HOOK_SOURCE, true).catch((error) => {
   showNotice(`引擎挂钩加载失败：${error.message}`);
 });
-

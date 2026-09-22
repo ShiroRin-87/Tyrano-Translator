@@ -4,14 +4,13 @@
   const READY_EVENT = "tyrano-translator:engine-ready";
   const HOOK_MARKER = Symbol("tyranoTranslatorHook");
   const REQUEST_TIMEOUT_MS = 60_000;
-  const CHINESE_FONT_FALLBACK = [
-    '"PingFang SC"',
+  const CHINESE_FONT_PRIMARY = [
     '"Microsoft YaHei UI"',
     '"Microsoft YaHei"',
+    '"PingFang SC"',
     '"Noto Sans CJK SC"',
     '"Source Han Sans SC"',
-    '"WenQuanYi Micro Hei"',
-    "sans-serif"
+    '"WenQuanYi Micro Hei"'
   ].join(", ");
   const pending = new Map();
   const hookedTags = new WeakSet();
@@ -30,9 +29,19 @@
     const messageSpan = latestMessageSpan(tag);
     if (!messageSpan || typeof getComputedStyle !== "function") return;
     const gameFont = getComputedStyle(messageSpan).fontFamily?.trim();
-    messageSpan.style.fontFamily = gameFont
-      ? `${gameFont}, ${CHINESE_FONT_FALLBACK}`
-      : CHINESE_FONT_FALLBACK;
+    const fontFamily = gameFont
+      ? `${CHINESE_FONT_PRIMARY}, ${gameFont}, sans-serif`
+      : `${CHINESE_FONT_PRIMARY}, sans-serif`;
+    if (typeof messageSpan.style.setProperty === "function") {
+      messageSpan.style.setProperty("font-family", fontFamily, "important");
+    } else {
+      messageSpan.style.fontFamily = fontFamily;
+    }
+  }
+
+  function currentSpeaker() {
+    if (typeof document.querySelector !== "function") return "";
+    return document.querySelector(".chara_name_area")?.textContent?.trim() ?? "";
   }
 
   function wrapAsRuby(tag, translation, position) {
@@ -94,7 +103,7 @@
       pending.set(id, { originalStart, tag: this, pm: { ...pm }, timeout });
       document.dispatchEvent(
         new CustomEvent(REQUEST_EVENT, {
-          detail: { id, text: String(pm.val), pageUrl: location.href }
+          detail: { id, text: String(pm.val), speaker: currentSpeaker(), pageUrl: location.href }
         })
       );
       return undefined;

@@ -10,6 +10,7 @@ Tyrano Translator 提供独立桌面浏览器和 Manifest V3 扩展两种运行�
 - 纯译文模式：译文覆盖日文，并沿用游戏的逐字动画、点击等待和自动播放。
 - Ruby 对照模式：原文保留，译文显示在每段原文上方或下方。
 - AI 自动提取并维护每个游戏独立的角色名、地名和专用词术语表。
+- 参考 GPP 的姓名＋句子、滚动上下文、命中术语、格式保护、质量检查和问题句重翻流程。
 - 本地缓存相同原文，减少重复请求和费用。
 - 支持 OpenAI Responses API 以及实现相同 `/responses` 协议的兼容服务。
 - 请求失败后自动恢复日文，不会永久阻塞剧情。
@@ -31,7 +32,7 @@ npm run browser:dir
 npm run browser:dist
 ```
 
-安装包位于 `release-browser/Tyrano-Translator-Browser-0.3.1-Setup.exe`。首次运行后点击工具栏中的“翻译设置”，只需填写自己的 API Key。项目的构建命令不会自动启动浏览器；只有 `npm run browser:start` 会打开窗口。
+安装包位于 `release-browser/Tyrano-Translator-Browser-0.4.0-Setup.exe`。首次运行后点击工具栏中的“翻译设置”，只需填写自己的 API Key。项目的构建命令不会自动启动浏览器；只有 `npm run browser:start` 会打开窗口。
 
 ## 扩展本地安装
 
@@ -87,4 +88,4 @@ npm run build
 npm run browser:dir
 ```
 
-独立浏览器的手动验收步骤见 [`BROWSER_TESTING.md`](BROWSER_TESTING.md)。架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，目标站兼容性见 [`SITE_COMPATIBILITY.md`](SITE_COMPATIBILITY.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。
+独立浏览器的手动验收步骤见 [`BROWSER_TESTING.md`](BROWSER_TESTING.md)，GPP 流程适配见 [`GPP_WORKFLOW.md`](GPP_WORKFLOW.md)。架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，目标站兼容性见 [`SITE_COMPATIBILITY.md`](SITE_COMPATIBILITY.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。

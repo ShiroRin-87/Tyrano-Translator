@@ -33,7 +33,8 @@ async function updateStorageSummary() {
     "glossaries"
   ]);
   const termCount = Object.values(glossaries).reduce((sum, entries) => sum + entries.length, 0);
-  storageSummary.textContent = `已缓存 ${translationCache.length} 条译文；${Object.keys(glossaries).length} 个游戏共有 ${termCount} 条 AI 术语。`;
+  const problemCount = translationCache.filter((entry) => entry.problems?.length).length;
+  storageSummary.textContent = `已缓存 ${translationCache.length} 条译文，其中 ${problemCount} 条带质量提示；${Object.keys(glossaries).length} 个游戏共有 ${termCount} 条 AI 术语。`;
 }
 
 form.addEventListener("submit", async (event) => {

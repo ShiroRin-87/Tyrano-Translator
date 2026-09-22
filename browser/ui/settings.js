@@ -16,7 +16,7 @@ function render(settings) {
     else element.value = settings[key];
   }
   fields.rubyPosition.disabled = fields.displayMode.value !== "ruby";
-  summary.textContent = `已缓存 ${settings.cacheCount} 条译文；${settings.gameCount} 个游戏共有 ${settings.glossaryCount} 条 AI 术语。`;
+  summary.textContent = `已缓存 ${settings.cacheCount} 条译文，其中 ${settings.problemCount} 条带质量提示；${settings.gameCount} 个游戏共有 ${settings.glossaryCount} 条 AI 术语。`;
 }
 
 document.querySelector("#settings-form").addEventListener("submit", async (event) => {
@@ -43,4 +43,3 @@ document.querySelector("#clear-cache").addEventListener("click", async () => ren
 document.querySelector("#clear-glossaries").addEventListener("click", async () => render(await window.tyranoBrowser.clearGlossaries()));
 
 window.tyranoBrowser.getSettings().then(render);
-

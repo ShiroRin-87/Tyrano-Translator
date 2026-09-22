@@ -13,18 +13,18 @@
   ].join(", ");
   const OUTPUT_ATTRIBUTE = "data-tyrano-translator-output";
   const SETTLE_DELAY_MS = 180;
-  const CHINESE_FONT_FALLBACK = [
-    '"PingFang SC"',
+  const CHINESE_FONT_PRIMARY = [
     '"Microsoft YaHei UI"',
     '"Microsoft YaHei"',
+    '"PingFang SC"',
     '"Noto Sans CJK SC"',
     '"Source Han Sans SC"',
-    '"WenQuanYi Micro Hei"',
-    "sans-serif"
+    '"WenQuanYi Micro Hei"'
   ].join(", ");
   const timers = new WeakMap();
   const requestVersions = new WeakMap();
   const { normalizeText, shouldTranslate } = globalThis.TyranoTextCore;
+  const documentId = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
   let engineHookActive = document.documentElement.dataset.tyranoTranslatorEngineHook === "active";
   let lastNotice = "";
 
@@ -66,9 +66,15 @@
     try {
       const response = await chrome.runtime.sendMessage({
         type: "TYRANO_TRANSLATE_TEXT",
-        payload: { text: detail.text, pageUrl: detail.pageUrl }
+        payload: {
+          text: detail.text,
+          speaker: typeof detail.speaker === "string" ? detail.speaker : "",
+          documentId,
+          pageUrl: detail.pageUrl
+        }
       });
       if (response?.error) showNotice(response.error);
+      if (response?.warning) showNotice(response.warning);
       document.dispatchEvent(
         new CustomEvent(RESPONSE_EVENT, {
           detail: {
@@ -99,9 +105,10 @@
 
   function applyChineseFontFallback(target, styleSource = target) {
     const gameFont = getComputedStyle(styleSource).fontFamily?.trim();
-    target.style.fontFamily = gameFont
-      ? `${gameFont}, ${CHINESE_FONT_FALLBACK}`
-      : CHINESE_FONT_FALLBACK;
+    const fontFamily = gameFont
+      ? `${CHINESE_FONT_PRIMARY}, ${gameFont}, sans-serif`
+      : `${CHINESE_FONT_PRIMARY}, sans-serif`;
+    target.style.setProperty("font-family", fontFamily, "important");
   }
 
   async function renderTranslation(element, source, translation) {
@@ -152,7 +159,12 @@
     try {
       const response = await chrome.runtime.sendMessage({
         type: "TYRANO_TRANSLATE_TEXT",
-        payload: { text: source, pageUrl: location.href }
+        payload: {
+          text: source,
+          speaker: document.querySelector(".chara_name_area")?.textContent?.trim() ?? "",
+          documentId,
+          pageUrl: location.href
+        }
       });
 
       if (requestVersions.get(element) !== version) return;

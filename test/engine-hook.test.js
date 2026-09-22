@@ -74,8 +74,16 @@ test("engine hook neutralizes angle brackets before Tyrano builds HTML", async (
   assert.deepEqual(calls, ["＜勇者＞"]);
 });
 
-test("engine hook keeps the game font and appends Chinese fallbacks", async () => {
-  const messageSpan = { style: {} };
+test("engine hook gives Chinese fonts priority over the game Japanese font", async () => {
+  const messageSpan = {
+    style: {
+      setProperty(name, value, priority) {
+        this[name] = value;
+        this.fontFamily = value;
+        this.priority = priority;
+      }
+    }
+  };
   const currentSpan = { lastElementChild: messageSpan };
   const pageDocument = new EventTarget();
   pageDocument.documentElement = { dataset: {} };
@@ -104,7 +112,12 @@ test("engine hook keeps the game font and appends Chinese fallbacks", async () =
   await import(`../src/page/engine-hook.js?font=${Date.now()}`);
   textTag.start({ val: "日本語" });
 
-  assert.match(messageSpan.style.fontFamily, /^"Game Display Font",/);
+  assert.match(messageSpan.style.fontFamily, /^"Microsoft YaHei UI",/);
   assert.match(messageSpan.style.fontFamily, /Microsoft YaHei/);
   assert.match(messageSpan.style.fontFamily, /Noto Sans CJK SC/);
+  assert.equal(messageSpan.style.priority, "important");
+  assert.ok(
+    messageSpan.style.fontFamily.indexOf('"Microsoft YaHei"') <
+      messageSpan.style.fontFamily.indexOf('"Game Display Font"')
+  );
 });

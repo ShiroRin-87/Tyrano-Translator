@@ -47,3 +47,51 @@ test("browser translation service caches AI responses", async () => {
   assert.equal(requestCount, 1);
 });
 
+test("browser translation follows rolling context and retries layout problems", async () => {
+  const store = new MemoryStore();
+  await store.update((data) => ({
+    ...data,
+    apiKey: "secret",
+    model: "test-model",
+    glossaries: {
+      "https://1.sv01.novelgame.jp/game/1/Game/": [
+        { source: "王都", target: "王都", note: "地名" },
+        { source: "未命中", target: "不应发送", note: "测试" }
+      ]
+    }
+  }));
+  const requests = [];
+  const outputs = ["你好", "没有换行", "前往王都<br>立刻出发"];
+  const service = new TranslationService(store, {
+    fetchImpl: async (_url, init) => {
+      requests.push(JSON.parse(init.body));
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => ({
+          output_text: JSON.stringify({ translation: outputs.shift(), glossary_updates: [] })
+        })
+      };
+    }
+  });
+  const common = {
+    pageUrl: "https://1.sv01.novelgame.jp/game/1/Game/",
+    documentId: "document-a"
+  };
+
+  await service.translate({ ...common, speaker: "アリス", text: "こんにちは" });
+  const result = await service.translate({ ...common, speaker: "ボブ", text: "王都へ\nすぐ行く" });
+
+  assert.equal(result.translation, "前往王都\n立刻出发");
+  assert.equal(requests.length, 3);
+  assert.match(requests[1].instructions, /王都 => 王都/);
+  assert.doesNotMatch(requests[1].instructions, /未命中 =>/);
+  assert.match(requests[2].instructions, /换行数量不一致/);
+  const secondInput = JSON.parse(requests[1].input);
+  assert.equal(secondInput.name, "ボブ");
+  assert.equal(secondInput.message, "王都へ<br>すぐ行く");
+  assert.deepEqual(secondInput.previous_context, [
+    { name: "アリス", source: "こんにちは", translation: "你好" }
+  ]);
+});
