@@ -4,12 +4,64 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tyrano Translator 设置</title>
+    <link rel="stylesheet" href="options.css">
   </head>
   <body>
     <main>
-      <h1>Tyrano Translator 设置</h1>
-      <p>设置界面将在后续步骤接入 AI 服务配置。</p>
+      <header>
+        <p class="eyebrow">浏览器扩展</p>
+        <h1>Tyrano Translator</h1>
+        <p class="intro">填入你自己的 API Key 后，扩展会自动翻译 TyranoScript 游戏中的文字。图片不会被读取或翻译。</p>
+      </header>
+
+      <form id="settings-form">
+        <label class="toggle-row">
+          <span>
+            <strong>启用实时翻译</strong>
+            <small>关闭后停止新的翻译请求，现有缓存和术语表会保留。</small>
+          </span>
+          <input id="enabled" name="enabled" type="checkbox">
+        </label>
+
+        <label>
+          <span>API Key</span>
+          <input id="api-key" name="apiKey" type="password" autocomplete="off" placeholder="sk-…" required>
+          <small>仅保存在浏览器扩展的本地存储中，不会写入网页或开发日志。</small>
+        </label>
+
+        <div class="grid">
+          <label>
+            <span>目标语言</span>
+            <input id="target-language" name="targetLanguage" type="text" required>
+          </label>
+          <label>
+            <span>模型</span>
+            <input id="model" name="model" type="text" required>
+          </label>
+        </div>
+
+        <label>
+          <span>API 基础地址</span>
+          <input id="base-url" name="baseUrl" type="url" required>
+          <small>默认使用 OpenAI Responses API；兼容服务需要提供相同的 <code>/responses</code> 接口。</small>
+        </label>
+
+        <div class="actions">
+          <button class="primary" type="submit">保存设置</button>
+          <output id="save-status" role="status" aria-live="polite"></output>
+        </div>
+      </form>
+
+      <section aria-labelledby="local-data-title">
+        <h2 id="local-data-title">本地数据</h2>
+        <p id="storage-summary">正在统计缓存和术语…</p>
+        <div class="danger-actions">
+          <button id="clear-cache" type="button">清空译文缓存</button>
+          <button id="clear-glossaries" type="button">清空 AI 术语表</button>
+        </div>
+      </section>
     </main>
+    <script type="module" src="options.js"></script>
   </body>
 </html>
 

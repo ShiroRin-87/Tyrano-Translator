@@ -19,6 +19,18 @@ h1 {
 
 button {
   cursor: pointer;
+  padding: 8px 10px;
   width: 100%;
 }
 
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.toggle-row input {
+  width: 18px;
+  height: 18px;
+}
