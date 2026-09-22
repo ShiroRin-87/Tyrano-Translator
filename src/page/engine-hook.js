@@ -8,6 +8,10 @@
   const hookedTags = new WeakSet();
   let requestSequence = 0;
 
+  function sanitizeForTyrano(text) {
+    return text.replaceAll("<", "＜").replaceAll(">", "＞");
+  }
+
   function wrapAsRuby(tag, translation, position) {
     const currentSpan = tag.kag?.getMessageCurrentSpan?.()?.get?.(0);
     const messageSpan = currentSpan?.lastElementChild;
@@ -44,7 +48,7 @@
       return;
     }
 
-    originalStart.call(tag, { ...pm, val: translation });
+    originalStart.call(tag, { ...pm, val: sanitizeForTyrano(translation) });
   }
 
   function hookTextTag(tag) {

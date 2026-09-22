@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tyrano Translator",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Translate TyranoScript browser games in real time with your own AI API key.",
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
