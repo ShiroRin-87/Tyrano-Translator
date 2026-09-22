@@ -1,10 +1,112 @@
-const ROOT_SELECTOR = "#tyrano_base, .tyrano_base";
+(() => {
+  const ROOT_SELECTOR = "#tyrano_base, .tyrano_base";
+  const TEXT_SELECTOR = [
+    ".message_inner",
+    ".chara_name_area",
+    ".chara_name",
+    ".vchat-text",
+    ".vchat-name",
+    ".fuki_box .text"
+  ].join(", ");
+  const OUTPUT_ATTRIBUTE = "data-tyrano-translator-output";
+  const SETTLE_DELAY_MS = 180;
+  const timers = new WeakMap();
+  const requestVersions = new WeakMap();
+  const { normalizeText, shouldTranslate } = globalThis.TyranoTextCore;
 
-function detectTyrano() {
-  return Boolean(document.querySelector(ROOT_SELECTOR));
-}
+  function sourceText(element) {
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll(`[${OUTPUT_ATTRIBUTE}]`).forEach((output) => output.remove());
+    return normalizeText(clone.textContent);
+  }
 
-if (detectTyrano()) {
-  document.documentElement.dataset.tyranoTranslator = "detected";
-}
+  function renderTranslation(element, source, translation) {
+    if (sourceText(element) !== source) return;
 
+    let output = element.querySelector(`:scope > [${OUTPUT_ATTRIBUTE}]`);
+    if (!output) {
+      output = document.createElement("div");
+      output.setAttribute(OUTPUT_ATTRIBUTE, "");
+      output.setAttribute("aria-label", "AI 翻译");
+      element.append(output);
+    }
+    output.textContent = normalizeText(translation);
+    element.dataset.tyranoTranslatorSource = source;
+  }
+
+  async function translateElement(element) {
+    if (!element.isConnected) return;
+    const source = sourceText(element);
+    if (!shouldTranslate(source) || element.dataset.tyranoTranslatorSource === source) return;
+
+    const version = (requestVersions.get(element) ?? 0) + 1;
+    requestVersions.set(element, version);
+    element.dataset.tyranoTranslatorState = "pending";
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: "TYRANO_TRANSLATE_TEXT",
+        payload: { text: source, pageUrl: location.href }
+      });
+
+      if (requestVersions.get(element) !== version || !response?.translation) return;
+      renderTranslation(element, source, response.translation);
+      element.dataset.tyranoTranslatorState = "translated";
+    } catch (error) {
+      element.dataset.tyranoTranslatorState = "error";
+      console.warn("[Tyrano Translator] Translation request failed", error);
+    }
+  }
+
+  function schedule(element) {
+    if (!(element instanceof Element) || !element.matches(TEXT_SELECTOR)) return;
+    clearTimeout(timers.get(element));
+    timers.set(element, setTimeout(() => translateElement(element), SETTLE_DELAY_MS));
+  }
+
+  function candidatesFromNode(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const parent = node.parentElement;
+      if (parent?.closest(`[${OUTPUT_ATTRIBUTE}]`)) return [];
+      const candidate = parent?.closest(TEXT_SELECTOR);
+      return candidate ? [candidate] : [];
+    }
+    if (!(node instanceof Element) || node.closest(`[${OUTPUT_ATTRIBUTE}]`)) return [];
+
+    const candidates = [];
+    if (node.matches(TEXT_SELECTOR)) candidates.push(node);
+    const parentCandidate = node.closest(TEXT_SELECTOR);
+    if (parentCandidate) candidates.push(parentCandidate);
+    candidates.push(...node.querySelectorAll(TEXT_SELECTOR));
+    return [...new Set(candidates)];
+  }
+
+  function start(root) {
+    document.documentElement.dataset.tyranoTranslator = "detected";
+    root.querySelectorAll(TEXT_SELECTOR).forEach(schedule);
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "characterData") {
+          candidatesFromNode(mutation.target).forEach(schedule);
+          continue;
+        }
+        mutation.addedNodes.forEach((node) => candidatesFromNode(node).forEach(schedule));
+      }
+    });
+    observer.observe(root, { childList: true, characterData: true, subtree: true });
+  }
+
+  const root = document.querySelector(ROOT_SELECTOR);
+  if (root) {
+    start(root);
+  } else {
+    const rootObserver = new MutationObserver(() => {
+      const createdRoot = document.querySelector(ROOT_SELECTOR);
+      if (!createdRoot) return;
+      rootObserver.disconnect();
+      start(createdRoot);
+    });
+    rootObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
+})();
