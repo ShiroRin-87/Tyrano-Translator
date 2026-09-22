@@ -215,3 +215,19 @@
 - 验证：确认本地分支从完整 `0.2.3` 状态创建，工作区无未提交文件。
 - 远程状态：GitHub HTTPS 连接失败，本地分支尚未推送；不会因此阻断本地开发。
 - 下一步：实现安全的 Electron 浏览器窗口和导航界面。
+
+## Step 014 — 实现独立浏览器安全外壳
+
+- 日期：2026-09-22
+- 状态：完成
+- 目标：提供受限于 `novelgame.jp` 的 Chromium 桌面浏览器导航体验。
+- 实际改动：
+  - 使用 Electron `BrowserWindow + WebContentsView`，避免官方不建议的 `<webview>` 标签。
+  - 提供地址栏、作品编号直达、前进、后退、刷新、主页和翻译设置入口。
+  - 仅允许 HTTPS `novelgame.jp` 及其子域；阻止外部导航、弹窗、下载和网站权限申请。
+  - 检测作品页中的实际游戏 iframe，并把托管游戏地址提升到顶层视图，确保翻译预加载脚本运行。
+  - 主界面与远程游戏使用隔离进程；启用 context isolation、renderer sandbox 和 web security，禁用 Node.js integration。
+  - 新增 URL 策略测试和浏览器静态安全检查。
+- 依据：Electron 官方建议用 WebContentsView 显示远程内容，并要求禁用 Node.js integration、启用 context isolation、sandbox、权限控制和导航限制。
+- 验证：运行 URL 策略测试、浏览器静态检查和 JavaScript 语法检查；未启动 Electron 窗口。
+- 下一步：把 AI 翻译后端、引擎预加载桥接和设置存储集成到浏览器进程。

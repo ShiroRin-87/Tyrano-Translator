@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+    <title>Tyrano Translator Browser</title>
+    <link rel="stylesheet" href="shell.css">
+  </head>
+  <body>
+    <header class="toolbar">
+      <nav aria-label="浏览导航">
+        <button id="back" type="button" title="后退" aria-label="后退">←</button>
+        <button id="forward" type="button" title="前进" aria-label="前进">→</button>
+        <button id="reload" type="button" title="刷新" aria-label="刷新">↻</button>
+        <button id="home" type="button" title="novelgame.jp 首页" aria-label="主页">⌂</button>
+      </nav>
+      <form id="address-form">
+        <span id="secure-indicator" title="仅允许 HTTPS novelgame.jp">◆</span>
+        <input id="address" type="text" autocomplete="off" spellcheck="false" aria-label="地址或作品编号">
+      </form>
+      <span id="loading" aria-live="polite"></span>
+      <button id="settings" type="button">翻译设置</button>
+    </header>
+    <script src="shell.js"></script>
+  </body>
+</html>
+

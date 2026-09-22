@@ -3,8 +3,11 @@
   "version": "0.2.3",
   "private": true,
   "type": "module",
+  "main": "browser/main.mjs",
   "scripts": {
     "build": "node scripts/build-extension.mjs",
+    "browser:prepare": "node scripts/build-browser-preload.mjs",
+    "browser:check": "node scripts/check-browser.mjs",
     "check": "node scripts/check-extension.mjs",
     "test": "node --test"
   },
