@@ -1,0 +1,4 @@
+html[data-tyrano-translator="detected"] {
+  --tyrano-translator-ready: 1;
+}
+

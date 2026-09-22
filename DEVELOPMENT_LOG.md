@@ -55,3 +55,17 @@
   - 记录后续提交前缀规范。
 - 验证：`main` 已正确跟随远程历史，未覆盖远程内容。
 - 下一步：创建浏览器扩展项目骨架。
+
+## Step 003 — 创建 Manifest V3 扩展骨架
+
+- 日期：2026-09-22
+- 状态：完成
+- 目标：建立无需构建即可加载的浏览器扩展基础结构。
+- 实际改动：
+  - 新增 Manifest V3 清单、后台 Service Worker、内容脚本、弹窗和设置页入口。
+  - 内容脚本仅在发现 `#tyrano_base` 或 `.tyrano_base` 时标记 Tyrano 页面。
+  - 新增 Node.js 静态检查脚本，验证清单版本和所有入口文件是否存在。
+  - README 增加项目范围和本地检查命令。
+- 设计依据：TyranoScript 官方源码以 `#tyrano_base.tyrano_base` 作为游戏根节点，消息内容位于消息层中；后续使用 DOM 观察方式适配多个 Tyrano 版本，不修改游戏脚本。
+- 验证：运行 `npm run check`、`npm test` 以及 JavaScript 语法检查。
+- 下一步：实现 Tyrano 文本捕获、去抖、去重和翻译结果写回。
