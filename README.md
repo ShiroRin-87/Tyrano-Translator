@@ -2,6 +2,8 @@
 
 Tyrano Translator 是一个 Manifest V3 浏览器扩展。它在 TyranoScript 把剧情文字绘制到消息框之前调用 AI，并使用玩家自己的 API Key 实时翻译。扩展只处理网页文字，不识别或翻译图片。
 
+当前目标站点为 [novelgame.jp](https://novelgame.jp/)。扩展覆盖主站、站内 iframe 以及实际承载游戏的 `*.novelgame.jp` 子域。
+
 ## 功能
 
 - 在 `text.start` 阶段拦截剧情文本，AI 返回后再交给 Tyrano 原生消息流程。
@@ -36,10 +38,13 @@ Tyrano Translator 是一个 Manifest V3 浏览器扩展。它在 TyranoScript �
 
 Ruby 模式使用浏览器原生 `<ruby>` 排版。译文通常比日文更长，个别游戏的窄消息框可能需要缩小游戏字体或切换为纯译文模式。
 
+译文不使用扩展自带或远程字体。扩展优先保留 Tyrano 当前游戏字体，并依次追加苹方、微软雅黑、Noto/思源黑体和文泉驿作为中文字形回退；游戏字体缺少中文时，浏览器会自动选择本机可用的中文字体。Ruby 和降级译文也继承消息节点的字号、粗细与样式。
+
 ## 权限说明
 
 - `storage`：在扩展本地存储设置、API Key、译文缓存和 AI 术语表。
-- `<all_urls>`：识别不同网站及 iframe 中运行的 Tyrano 游戏，并向用户配置的 API 地址发送请求。
+- 页面脚本仅在 `novelgame.jp` 及其子域运行。
+- `<all_urls>` 主机权限：允许扩展后台向玩家自行配置的 API 地址发送翻译请求；API Key 不会交给游戏页面。
 
 扩展不会读取图片，也不会把 API Key 注入游戏页面。更完整的说明见 [`PRIVACY.md`](PRIVACY.md)。
 
@@ -60,4 +65,4 @@ npm test
 npm run build
 ```
 
-架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。
+架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，目标站兼容性见 [`SITE_COMPATIBILITY.md`](SITE_COMPATIBILITY.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。

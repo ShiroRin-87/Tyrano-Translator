@@ -14,6 +14,9 @@ html[data-tyrano-translator="detected"] {
 }
 
 ruby[data-tyrano-translator-ruby] {
+  font-family: inherit;
+  font-style: inherit;
+  font-weight: inherit;
   ruby-align: center;
   ruby-position: over;
 }
@@ -24,6 +27,8 @@ ruby[data-tyrano-translator-position="under"] {
 
 ruby[data-tyrano-translator-ruby] rt {
   color: #fff7b2;
+  font-family: inherit;
+  font-style: inherit;
   font-size: 0.56em;
   font-weight: 600;
   line-height: 1.15;

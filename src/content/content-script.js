@@ -13,6 +13,15 @@
   ].join(", ");
   const OUTPUT_ATTRIBUTE = "data-tyrano-translator-output";
   const SETTLE_DELAY_MS = 180;
+  const CHINESE_FONT_FALLBACK = [
+    '"PingFang SC"',
+    '"Microsoft YaHei UI"',
+    '"Microsoft YaHei"',
+    '"Noto Sans CJK SC"',
+    '"Source Han Sans SC"',
+    '"WenQuanYi Micro Hei"',
+    "sans-serif"
+  ].join(", ");
   const timers = new WeakMap();
   const requestVersions = new WeakMap();
   const { normalizeText, shouldTranslate } = globalThis.TyranoTextCore;
@@ -88,6 +97,13 @@
     return normalizeText(clone.textContent);
   }
 
+  function applyChineseFontFallback(target, styleSource = target) {
+    const gameFont = getComputedStyle(styleSource).fontFamily?.trim();
+    target.style.fontFamily = gameFont
+      ? `${gameFont}, ${CHINESE_FONT_FALLBACK}`
+      : CHINESE_FONT_FALLBACK;
+  }
+
   async function renderTranslation(element, source, translation) {
     if (sourceText(element) !== source) return;
 
@@ -98,6 +114,7 @@
 
     if (displayMode === "translation") {
       element.textContent = normalizeText(translation);
+      applyChineseFontFallback(element);
       element.dataset.tyranoTranslatorSource = source;
       element.dataset.tyranoTranslatorRendered = normalizeText(translation);
       element.dataset.tyranoTranslatorState = "translated";
@@ -112,6 +129,7 @@
       element.append(output);
     }
     output.textContent = normalizeText(translation);
+    applyChineseFontFallback(output, element);
     output.dataset.position = rubyPosition === "under" ? "under" : "over";
     element.dataset.tyranoTranslatorSource = source;
   }

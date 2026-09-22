@@ -16,6 +16,12 @@ if (!mainWorldHook?.js?.includes("src/page/engine-hook.js")) {
   throw new Error("manifest.json 缺少页面主执行环境的 Tyrano 挂钩");
 }
 
+for (const entry of manifest.content_scripts ?? []) {
+  if (!entry.matches?.includes("https://*.novelgame.jp/*")) {
+    throw new Error("所有页面脚本都必须覆盖 novelgame.jp 游戏子域");
+  }
+}
+
 const requiredEntries = [
   manifest.background?.service_worker,
   manifest.action?.default_popup,

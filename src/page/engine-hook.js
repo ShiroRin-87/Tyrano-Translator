@@ -4,6 +4,15 @@
   const READY_EVENT = "tyrano-translator:engine-ready";
   const HOOK_MARKER = Symbol("tyranoTranslatorHook");
   const REQUEST_TIMEOUT_MS = 60_000;
+  const CHINESE_FONT_FALLBACK = [
+    '"PingFang SC"',
+    '"Microsoft YaHei UI"',
+    '"Microsoft YaHei"',
+    '"Noto Sans CJK SC"',
+    '"Source Han Sans SC"',
+    '"WenQuanYi Micro Hei"',
+    "sans-serif"
+  ].join(", ");
   const pending = new Map();
   const hookedTags = new WeakSet();
   let requestSequence = 0;
@@ -12,9 +21,22 @@
     return text.replaceAll("<", "＜").replaceAll(">", "＞");
   }
 
-  function wrapAsRuby(tag, translation, position) {
+  function latestMessageSpan(tag) {
     const currentSpan = tag.kag?.getMessageCurrentSpan?.()?.get?.(0);
-    const messageSpan = currentSpan?.lastElementChild;
+    return currentSpan?.lastElementChild ?? null;
+  }
+
+  function applyChineseFontFallback(tag) {
+    const messageSpan = latestMessageSpan(tag);
+    if (!messageSpan || typeof getComputedStyle !== "function") return;
+    const gameFont = getComputedStyle(messageSpan).fontFamily?.trim();
+    messageSpan.style.fontFamily = gameFont
+      ? `${gameFont}, ${CHINESE_FONT_FALLBACK}`
+      : CHINESE_FONT_FALLBACK;
+  }
+
+  function wrapAsRuby(tag, translation, position) {
+    const messageSpan = latestMessageSpan(tag);
     if (!messageSpan || messageSpan.matches("ruby[data-tyrano-translator-ruby]")) return;
 
     const ruby = document.createElement("ruby");
@@ -44,11 +66,13 @@
 
     if (response.displayMode === "ruby") {
       originalStart.call(tag, pm);
+      applyChineseFontFallback(tag);
       wrapAsRuby(tag, translation, response.rubyPosition);
       return;
     }
 
     originalStart.call(tag, { ...pm, val: sanitizeForTyrano(translation) });
+    applyChineseFontFallback(tag);
   }
 
   function hookTextTag(tag) {
