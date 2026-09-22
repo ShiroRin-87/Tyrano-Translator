@@ -17,6 +17,25 @@
   const requestVersions = new WeakMap();
   const { normalizeText, shouldTranslate } = globalThis.TyranoTextCore;
   let engineHookActive = document.documentElement.dataset.tyranoTranslatorEngineHook === "active";
+  let lastNotice = "";
+
+  function showNotice(message) {
+    const text = normalizeText(message);
+    if (!text || text === "翻译已暂停" || text === lastNotice) return;
+    lastNotice = text;
+    let notice = document.querySelector("#tyrano-translator-notice");
+    if (!notice) {
+      notice = document.createElement("aside");
+      notice.id = "tyrano-translator-notice";
+      notice.setAttribute("role", "status");
+      document.documentElement.append(notice);
+    }
+    notice.textContent = `Tyrano Translator：${text}`;
+    notice.dataset.visible = "true";
+    setTimeout(() => {
+      notice.dataset.visible = "false";
+    }, 6000);
+  }
 
   document.addEventListener(READY_EVENT, () => {
     engineHookActive = true;
@@ -40,6 +59,7 @@
         type: "TYRANO_TRANSLATE_TEXT",
         payload: { text: detail.text, pageUrl: detail.pageUrl }
       });
+      if (response?.error) showNotice(response.error);
       document.dispatchEvent(
         new CustomEvent(RESPONSE_EVENT, {
           detail: {
@@ -53,6 +73,7 @@
         })
       );
     } catch (error) {
+      showNotice(error instanceof Error ? error.message : String(error));
       document.dispatchEvent(
         new CustomEvent(RESPONSE_EVENT, {
           detail: { id: detail.id, ok: false, error: error instanceof Error ? error.message : String(error) }
@@ -123,6 +144,7 @@
       element.dataset.tyranoTranslatorState = "translated";
     } catch (error) {
       element.dataset.tyranoTranslatorState = "error";
+      showNotice(error instanceof Error ? error.message : String(error));
       console.warn("[Tyrano Translator] Translation request failed", error);
     }
   }

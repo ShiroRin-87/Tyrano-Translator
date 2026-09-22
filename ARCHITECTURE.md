@@ -28,7 +28,7 @@ TyranoScript 浏览器版把游戏挂载在 `#tyrano_base.tyrano_base` 下。KAG
 交回 Tyrano 原生 showMessage / addChars
 ```
 
-这样不会手动推进 `nextOrder()`，因此点击等待、自动播放、跳过、气泡、字体效果及消息层切换仍由 Tyrano 控制。请求失败或 45 秒超时会恢复显示原文，避免游戏永久卡住。
+这样不会手动推进 `nextOrder()`，因此点击等待、自动播放、跳过、气泡、字体效果及消息层切换仍由 Tyrano 控制。请求失败或 60 秒超时会恢复显示原文，避免游戏永久卡住。
 
 ## 两种显示模式
 
@@ -46,4 +46,3 @@ TyranoScript 浏览器版把游戏挂载在 `#tyrano_base.tyrano_base` 下。KAG
 - [TyranoScript `kag.tag.js`](https://github.com/ShikemokuMK/tyranoscript/blob/master/tyrano/plugins/kag/kag.tag.js)：`ftag.init`、`nextOrder`、`text.start`、`showMessage` 和逐字消息 DOM。
 - [TyranoScript `kag.js`](https://github.com/ShikemokuMK/tyranoscript/blob/master/tyrano/plugins/kag/kag.js)：消息层获取、当前 span 与角色名区域。
 - [TyranoScript `kag.tag_ext.js`](https://github.com/ShikemokuMK/tyranoscript/blob/master/tyrano/plugins/kag/kag.tag_ext.js)：`chara_ptext` 的角色名写入和流程推进。
-

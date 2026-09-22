@@ -5,8 +5,10 @@ import {
   DEFAULT_SETTINGS,
   buildTranslationRequest,
   extractResponseText,
+  fetchJsonWithRetry,
   findCachedTranslation,
   gameKeyFromUrl,
+  isRetryableStatus,
   mergeGlossary,
   parseTranslationResponse
 } from "../src/background/translation-core.js";
@@ -61,4 +63,33 @@ test("cache match includes model and target language", () => {
 
 test("game key uses the game directory rather than the whole page URL", () => {
   assert.equal(gameKeyFromUrl("https://games.example/title-a/index.html?save=1"), "https://games.example/title-a/");
+});
+
+test("retry policy covers throttling and temporary server failures", () => {
+  assert.equal(isRetryableStatus(429), true);
+  assert.equal(isRetryableStatus(503), true);
+  assert.equal(isRetryableStatus(401), false);
+});
+
+test("fetchJsonWithRetry retries a throttled request once", async () => {
+  const statuses = [429, 200];
+  let calls = 0;
+  const fetchImpl = async () => {
+    const status = statuses[calls++];
+    return {
+      ok: status === 200,
+      status,
+      headers: { get: () => null },
+      json: async () => ({ status })
+    };
+  };
+
+  const result = await fetchJsonWithRetry("https://api.example/responses", {}, {
+    fetchImpl,
+    sleep: async () => {},
+    timeoutMs: 100,
+    maxAttempts: 2
+  });
+  assert.equal(result.response.status, 200);
+  assert.equal(calls, 2);
 });

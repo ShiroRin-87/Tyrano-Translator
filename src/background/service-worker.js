@@ -1,6 +1,7 @@
 import {
   DEFAULT_SETTINGS,
   buildTranslationRequest,
+  fetchJsonWithRetry,
   findCachedTranslation,
   gameKeyFromUrl,
   mergeGlossary,
@@ -79,7 +80,7 @@ async function requestTranslation({ source, settings, pageUrl, glossaries, cache
   const gameKey = gameKeyFromUrl(pageUrl);
   const glossary = glossaries[gameKey] ?? [];
   const request = buildTranslationRequest({ text: source, settings, glossary });
-  const response = await fetch(request.endpoint, {
+  const { response, data } = await fetchJsonWithRetry(request.endpoint, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${settings.apiKey}`,
@@ -87,8 +88,6 @@ async function requestTranslation({ source, settings, pageUrl, glossaries, cache
     },
     body: JSON.stringify(request.body)
   });
-
-  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(data?.error?.message || `AI 请求失败（HTTP ${response.status}）`);
   }

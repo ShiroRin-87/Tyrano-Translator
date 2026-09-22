@@ -38,3 +38,27 @@ ruby[data-tyrano-translator-ruby] rt {
 [data-tyrano-translator-state="pending"] {
   cursor: progress;
 }
+
+#tyrano-translator-notice {
+  position: fixed;
+  z-index: 2147483647;
+  right: 16px;
+  bottom: 16px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border: 1px solid rgb(248 113 113 / 55%);
+  border-radius: 9px;
+  background: rgb(24 24 27 / 94%);
+  color: #fecaca;
+  font: 13px/1.5 system-ui, sans-serif;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+#tyrano-translator-notice[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}

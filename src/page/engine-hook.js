@@ -3,7 +3,7 @@
   const RESPONSE_EVENT = "tyrano-translator:translate-response";
   const READY_EVENT = "tyrano-translator:engine-ready";
   const HOOK_MARKER = Symbol("tyranoTranslatorHook");
-  const REQUEST_TIMEOUT_MS = 45_000;
+  const REQUEST_TIMEOUT_MS = 60_000;
   const pending = new Map();
   const hookedTags = new WeakSet();
   let requestSequence = 0;

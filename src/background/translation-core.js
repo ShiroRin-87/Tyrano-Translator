@@ -122,3 +122,45 @@ export function findCachedTranslation(cache, query) {
       entry.targetLanguage === query.targetLanguage
   );
 }
+
+export function isRetryableStatus(status) {
+  return status === 408 || status === 429 || status >= 500;
+}
+
+export async function fetchJsonWithRetry(
+  url,
+  init,
+  {
+    fetchImpl = fetch,
+    sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay)),
+    timeoutMs = 25_000,
+    maxAttempts = 2
+  } = {}
+) {
+  let lastError;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetchImpl(url, { ...init, signal: controller.signal });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok || !isRetryableStatus(response.status) || attempt === maxAttempts - 1) {
+        return { response, data };
+      }
+      const retryAfter = Number(response.headers?.get?.("Retry-After"));
+      const delay = Number.isFinite(retryAfter) && retryAfter > 0
+        ? Math.min(retryAfter * 1000, 5000)
+        : 600 * 2 ** attempt;
+      await sleep(delay);
+    } catch (error) {
+      lastError = error;
+      if (attempt === maxAttempts - 1) throw error;
+      await sleep(600 * 2 ** attempt);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  throw lastError ?? new Error("AI 请求失败");
+}
