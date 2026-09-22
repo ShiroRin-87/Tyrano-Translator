@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
+    <title>翻译设置</title>
+    <link rel="stylesheet" href="settings.css">
+  </head>
+  <body>
+    <main>
+      <h1>翻译设置</h1>
+      <p class="intro">配置只保存在这台电脑。游戏页面无法读取 API Key。</p>
+      <form id="settings-form">
+        <label class="toggle"><span>启用实时翻译</span><input id="enabled" type="checkbox"></label>
+        <label><span>API Key</span><input id="api-key" type="password" autocomplete="off" required></label>
+        <div class="grid">
+          <label><span>目标语言</span><input id="target-language" type="text" required></label>
+          <label><span>模型</span><input id="model" type="text" required></label>
+        </div>
+        <label><span>API 基础地址</span><input id="base-url" type="url" required></label>
+        <div class="grid">
+          <label>
+            <span>显示模式</span>
+            <select id="display-mode">
+              <option value="translation">纯译文（覆盖原文）</option>
+              <option value="ruby">Ruby 对照</option>
+            </select>
+          </label>
+          <label>
+            <span>Ruby 位置</span>
+            <select id="ruby-position">
+              <option value="over">原文上方</option>
+              <option value="under">原文下方</option>
+            </select>
+          </label>
+        </div>
+        <div class="actions"><button class="primary" type="submit">保存设置</button><output id="status"></output></div>
+      </form>
+      <section>
+        <h2>本地翻译数据</h2>
+        <p id="summary"></p>
+        <div class="actions">
+          <button id="clear-cache" type="button">清空译文缓存</button>
+          <button id="clear-glossaries" type="button">清空 AI 术语表</button>
+        </div>
+      </section>
+    </main>
+    <script src="settings.js"></script>
+  </body>
+</html>
+

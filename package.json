@@ -8,6 +8,7 @@
     "build": "node scripts/build-extension.mjs",
     "browser:prepare": "node scripts/build-browser-preload.mjs",
     "browser:check": "node scripts/check-browser.mjs",
+    "browser:start": "npm run browser:prepare && electron .",
     "check": "node scripts/check-extension.mjs",
     "test": "node --test"
   },

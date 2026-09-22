@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, WebContentsView, ipcMain, session } from "electron";
 
 import { BROWSER_HOME, isAllowedNavigation, isHostedGameUrl, normalizeNavigation } from "./url-policy.mjs";
+import { BrowserStore } from "./store.mjs";
+import { browserStoreDefaults, TranslationService } from "./translator.mjs";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const PARTITION = "persist:tyrano-translator-browser";
@@ -11,6 +13,7 @@ const TOOLBAR_HEIGHT = 64;
 let mainWindow;
 let gameView;
 let settingsWindow;
+let translationService;
 
 function viewState() {
   const contents = gameView?.webContents;
@@ -173,9 +176,39 @@ function registerNavigationIpc() {
   });
 }
 
-app.whenReady().then(() => {
+function registerTranslationIpc() {
+  const fromSettingsWindow = (event) => event.sender.id === settingsWindow?.webContents.id;
+  ipcMain.handle("translator:translate", async (event, payload) => {
+    if (event.sender.id !== gameView?.webContents.id) return { error: "拒绝了无效的翻译来源" };
+    if (!isAllowedNavigation(payload?.pageUrl)) return { error: "拒绝翻译目标站以外的页面" };
+    try {
+      return await translationService.translate(payload);
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : String(error) };
+    }
+  });
+  ipcMain.handle("settings:get", (event) => (fromSettingsWindow(event) ? translationService.getSettingsSummary() : null));
+  ipcMain.handle("settings:save", (event, settings) => {
+    if (!fromSettingsWindow(event)) throw new Error("拒绝了无效的设置来源");
+    return translationService.saveSettings(settings);
+  });
+  ipcMain.handle("settings:clear-cache", (event) => {
+    if (!fromSettingsWindow(event)) throw new Error("拒绝了无效的设置来源");
+    return translationService.clearCache();
+  });
+  ipcMain.handle("settings:clear-glossaries", (event) => {
+    if (!fromSettingsWindow(event)) throw new Error("拒绝了无效的设置来源");
+    return translationService.clearGlossaries();
+  });
+}
+
+app.whenReady().then(async () => {
   app.setAppUserModelId("jp.novelgame.tyrano-translator-browser");
+  const store = new BrowserStore(join(app.getPath("userData"), "translator-data.json"), browserStoreDefaults());
+  await store.initialize();
+  translationService = new TranslationService(store);
   registerNavigationIpc();
+  registerTranslationIpc();
   createMainWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
@@ -185,4 +218,3 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
-
