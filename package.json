@@ -1,6 +1,6 @@
 {
   "name": "tyrano-translator",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A dedicated browser and extension for AI-translating TyranoScript games on novelgame.jp.",
   "author": "ShiroRin-87",
   "private": true,

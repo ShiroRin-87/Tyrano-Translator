@@ -4,6 +4,7 @@ const requiredFiles = [
   "../browser/main.mjs",
   "../browser/preload.cjs",
   "../browser/guest-preload.template.cjs",
+  "../browser/navigation-guards.mjs",
   "../browser/store.mjs",
   "../browser/translator.mjs",
   "../browser/url-policy.mjs",
@@ -26,6 +27,14 @@ for (const requiredSetting of ["contextIsolation: true", "nodeIntegration: false
 if (!mainSource.includes("WebContentsView")) throw new Error("浏览器必须使用 WebContentsView 隔离远程页面");
 if (!mainSource.includes('event.sender.id !== gameView?.webContents.id')) {
   throw new Error("浏览器必须验证翻译 IPC 的发送页面");
+}
+
+const navigationGuardsSource = await readFile(new URL("../browser/navigation-guards.mjs", import.meta.url), "utf8");
+if (!navigationGuardsSource.includes('contents.on("will-frame-navigate", (details) =>')) {
+  throw new Error("浏览器必须使用 Electron 44 的单参数 will-frame-navigate 事件");
+}
+if (navigationGuardsSource.includes('will-frame-navigate", (event, details)')) {
+  throw new Error("浏览器仍在使用旧版 will-frame-navigate 参数签名");
 }
 
 const builderConfig = await readFile(new URL("../electron-builder.yml", import.meta.url), "utf8");

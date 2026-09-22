@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 
 import { app, BrowserWindow, WebContentsView, ipcMain, session } from "electron";
 
-import { BROWSER_HOME, isAllowedNavigation, isHostedGameUrl, normalizeNavigation } from "./url-policy.mjs";
+import { BROWSER_HOME, isAllowedNavigation, normalizeNavigation } from "./url-policy.mjs";
+import { installNavigationGuards } from "./navigation-guards.mjs";
 import { BrowserStore } from "./store.mjs";
 import { browserStoreDefaults, TranslationService } from "./translator.mjs";
 
@@ -45,26 +46,7 @@ function secureSession(browserSession) {
 }
 
 function secureGuest(contents) {
-  contents.setWindowOpenHandler(({ url }) => {
-    if (isAllowedNavigation(url)) setImmediate(() => contents.loadURL(url));
-    return { action: "deny" };
-  });
-
-  contents.on("will-navigate", (event, details) => {
-    const target = typeof details === "string" ? details : details.url;
-    if (!isAllowedNavigation(target)) event.preventDefault();
-  });
-
-  contents.on("will-frame-navigate", (event, details) => {
-    if (!isAllowedNavigation(details.url)) {
-      event.preventDefault();
-      return;
-    }
-    if (!details.isMainFrame && isHostedGameUrl(details.url)) {
-      event.preventDefault();
-      setImmediate(() => contents.loadURL(details.url));
-    }
-  });
+  installNavigationGuards(contents);
 
   for (const eventName of ["did-start-loading", "did-stop-loading", "did-navigate", "did-navigate-in-page", "page-title-updated"]) {
     contents.on(eventName, sendState);

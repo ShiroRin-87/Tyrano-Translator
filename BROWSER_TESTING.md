@@ -6,13 +6,13 @@
 
 二选一：
 
-- 运行安装包 `release-browser/Tyrano-Translator-Browser-0.3.0-Setup.exe`，安装后从开始菜单启动；
+- 运行安装包 `release-browser/Tyrano-Translator-Browser-0.3.1-Setup.exe`，安装后从开始菜单启动；
 - 直接运行 `release-browser/win-unpacked/Tyrano Translator Browser.exe`。
 
 当前构建没有 Windows 代码签名证书，SmartScreen 可能显示“未知发布者”。请先核对安装包 SHA-256：
 
 ```text
-27D98706F91E9DDC0B97A5AEE330C2293313A459C0D687882C5D61AA15E29579
+E7621AC10BA0556F146154F5BE778E8B8451E0BD1A16B3ECDF8ACD9E3C7F61D7
 ```
 
 ## 2. 配置翻译
