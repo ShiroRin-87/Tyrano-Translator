@@ -1,6 +1,6 @@
 # Tyrano Translator
 
-Tyrano Translator 是一个 Manifest V3 浏览器扩展。它在 TyranoScript 把剧情文字绘制到消息框之前调用 AI，并使用玩家自己的 API Key 实时翻译。扩展只处理网页文字，不识别或翻译图片。
+Tyrano Translator 提供独立桌面浏览器和 Manifest V3 扩展两种运行方式。它在 TyranoScript 把剧情文字绘制到消息框之前调用 AI，并使用玩家自己的 API Key 实时翻译。项目只处理网页文字，不识别或翻译图片。
 
 当前目标站点为 [novelgame.jp](https://novelgame.jp/)。扩展覆盖主站、站内 iframe 以及实际承载游戏的 `*.novelgame.jp` 子域。
 
@@ -14,16 +14,35 @@ Tyrano Translator 是一个 Manifest V3 浏览器扩展。它在 TyranoScript �
 - 支持 OpenAI Responses API 以及实现相同 `/responses` 协议的兼容服务。
 - 请求失败后自动恢复日文，不会永久阻塞剧情。
 
-## 本地安装
+## 独立浏览器
 
-1. 安装 Node.js 20 或更高版本。
+独立浏览器内置 Chromium 与翻译后端，不需要另外安装扩展。它只允许访问 `novelgame.jp` 及其子域，并提供作品编号直达、前进、后退、刷新、主页和翻译设置。
+
+在 Windows 上生成免安装目录：
+
+```powershell
+npm install
+npm run browser:dir
+```
+
+程序位于 `release-browser/win-unpacked/Tyrano Translator Browser.exe`。生成安装程序：
+
+```powershell
+npm run browser:dist
+```
+
+安装包位于 `release-browser/Tyrano-Translator-Browser-0.3.0-Setup.exe`。首次运行后点击工具栏中的“翻译设置”，只需填写自己的 API Key。项目的构建命令不会自动启动浏览器；只有 `npm run browser:start` 会打开窗口。
+
+## 扩展本地安装
+
+1. 安装 Node.js 22.12 或更高版本。
 2. 在项目目录运行 `npm run build`。
 3. 打开 Chromium 系浏览器的扩展管理页并开启“开发者模式”。
 4. 选择“加载已解压的扩展程序”，指向 `dist/tyrano-translator`。
 5. 打开扩展设置，粘贴自己的 API Key 后保存。
 6. 刷新已经打开的 Tyrano 游戏页面。
 
-本项目不会自动打开浏览器，也不包含 API Key。
+本项目不包含 API Key。
 
 ## 设置
 
@@ -60,9 +79,12 @@ Ruby 模式使用浏览器原生 `<ruby>` 排版。译文通常比日文更长�
 ## 开发与验证
 
 ```powershell
+npm install
 npm run check
+npm run browser:check
 npm test
 npm run build
+npm run browser:dir
 ```
 
-架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，目标站兼容性见 [`SITE_COMPATIBILITY.md`](SITE_COMPATIBILITY.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。
+独立浏览器的手动验收步骤见 [`BROWSER_TESTING.md`](BROWSER_TESTING.md)。架构分析见 [`ARCHITECTURE.md`](ARCHITECTURE.md)，目标站兼容性见 [`SITE_COMPATIBILITY.md`](SITE_COMPATIBILITY.md)，逐步开发记录见 [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md)。

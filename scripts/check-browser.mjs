@@ -9,10 +9,12 @@ const requiredFiles = [
   "../browser/url-policy.mjs",
   "../browser/ui/index.html",
   "../browser/ui/shell.css",
-  "../browser/ui/shell.js"
-  ,"../browser/ui/settings.html"
-  ,"../browser/ui/settings.css"
-  ,"../browser/ui/settings.js"
+  "../browser/ui/shell.js",
+  "../browser/ui/settings.html",
+  "../browser/ui/settings.css",
+  "../browser/ui/settings.js",
+  "../scripts/package-browser.mjs",
+  "../electron-builder.yml"
 ];
 
 await Promise.all(requiredFiles.map((path) => readFile(new URL(path, import.meta.url))));
@@ -24,6 +26,11 @@ for (const requiredSetting of ["contextIsolation: true", "nodeIntegration: false
 if (!mainSource.includes("WebContentsView")) throw new Error("浏览器必须使用 WebContentsView 隔离远程页面");
 if (!mainSource.includes('event.sender.id !== gameView?.webContents.id')) {
   throw new Error("浏览器必须验证翻译 IPC 的发送页面");
+}
+
+const builderConfig = await readFile(new URL("../electron-builder.yml", import.meta.url), "utf8");
+for (const requiredEntry of ["browser/**/*", "src/background/translation-core.js", "nsis:"]) {
+  if (!builderConfig.includes(requiredEntry)) throw new Error(`打包配置缺少：${requiredEntry}`);
 }
 
 console.log(`Standalone browser shell is valid; checked ${requiredFiles.length} files.`);

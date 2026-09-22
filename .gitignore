@@ -2,6 +2,7 @@ node_modules/
 dist/
 browser/generated/
 release-browser/
+.electron-builder-cache/
 coverage/
 *.log
 .DS_Store

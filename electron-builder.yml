@@ -1,0 +1,28 @@
+appId: io.github.shirorin87.tyrano-translator-browser
+productName: Tyrano Translator Browser
+asar: true
+electronDist: node_modules/electron/dist
+
+directories:
+  output: release-browser
+
+files:
+  - browser/**/*
+  - src/background/translation-core.js
+  - package.json
+
+win:
+  signAndEditExecutable: false
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: Tyrano-Translator-Browser-${version}-Setup.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  packElevateHelper: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Tyrano Translator Browser

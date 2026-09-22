@@ -1,6 +1,8 @@
 {
   "name": "tyrano-translator",
-  "version": "0.2.3",
+  "version": "0.3.0",
+  "description": "A dedicated browser and extension for AI-translating TyranoScript games on novelgame.jp.",
+  "author": "ShiroRin-87",
   "private": true,
   "type": "module",
   "main": "browser/main.mjs",
@@ -9,10 +11,19 @@
     "browser:prepare": "node scripts/build-browser-preload.mjs",
     "browser:check": "node scripts/check-browser.mjs",
     "browser:start": "npm run browser:prepare && electron .",
+    "browser:dir": "npm run browser:prepare && node scripts/package-browser.mjs dir",
+    "browser:dist": "npm run browser:prepare && node scripts/package-browser.mjs nsis",
     "check": "node scripts/check-extension.mjs",
     "test": "node --test"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "electron": "44.4.3",
+    "electron-builder": "26.15.3"
+  },
+  "allowScripts": {
+    "electron@44.4.3": true
   }
 }
