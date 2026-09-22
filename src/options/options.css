@@ -81,7 +81,8 @@ small {
 
 input[type="text"],
 input[type="password"],
-input[type="url"] {
+input[type="url"],
+select {
   width: 100%;
   padding: 11px 13px;
   border: 1px solid #3d444d;
@@ -90,6 +91,11 @@ input[type="url"] {
   background: #0d1117;
   color: inherit;
   font: inherit;
+}
+
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 input:focus {
@@ -172,4 +178,3 @@ button:hover {
     gap: 0;
   }
 }
-

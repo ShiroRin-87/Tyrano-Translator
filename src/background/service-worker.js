@@ -52,7 +52,14 @@ async function translate(payload) {
   const stored = await chrome.storage.local.get(["translationCache", "glossaries"]);
   const cacheQuery = { source, model: settings.model, targetLanguage: settings.targetLanguage };
   const cached = findCachedTranslation(stored.translationCache ?? [], cacheQuery);
-  if (cached) return { translation: cached.translation, cached: true };
+  if (cached) {
+    return {
+      translation: cached.translation,
+      cached: true,
+      displayMode: settings.displayMode,
+      rubyPosition: settings.rubyPosition
+    };
+  }
 
   const requestKey = JSON.stringify(cacheQuery);
   if (inFlight.has(requestKey)) return inFlight.get(requestKey);
@@ -105,5 +112,10 @@ async function requestTranslation({ source, settings, pageUrl, glossaries, cache
     }
   }));
 
-  return { translation, cached: false };
+  return {
+    translation,
+    cached: false,
+    displayMode: settings.displayMode,
+    rubyPosition: settings.rubyPosition
+  };
 }

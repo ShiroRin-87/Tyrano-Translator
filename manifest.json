@@ -20,9 +20,16 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "js": ["src/page/engine-hook.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": ["<all_urls>"],
       "js": ["src/content/text-core.js", "src/content/content-script.js"],
       "css": ["src/content/content.css"],
-      "run_at": "document_idle",
+      "run_at": "document_start",
       "all_frames": true
     }
   ]

@@ -3,7 +3,9 @@ export const DEFAULT_SETTINGS = Object.freeze({
   apiKey: "",
   baseUrl: "https://api.openai.com/v1",
   model: "gpt-5.6-luna",
-  targetLanguage: "简体中文"
+  targetLanguage: "简体中文",
+  displayMode: "translation",
+  rubyPosition: "over"
 });
 
 const RESPONSE_SCHEMA = Object.freeze({
@@ -120,4 +122,3 @@ export function findCachedTranslation(cache, query) {
       entry.targetLanguage === query.targetLanguage
   );
 }
-

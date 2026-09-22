@@ -6,6 +6,8 @@ const apiKeyInput = document.querySelector("#api-key");
 const baseUrlInput = document.querySelector("#base-url");
 const modelInput = document.querySelector("#model");
 const targetLanguageInput = document.querySelector("#target-language");
+const displayModeInput = document.querySelector("#display-mode");
+const rubyPositionInput = document.querySelector("#ruby-position");
 const saveStatus = document.querySelector("#save-status");
 const storageSummary = document.querySelector("#storage-summary");
 
@@ -16,6 +18,13 @@ async function loadSettings() {
   baseUrlInput.value = settings.baseUrl;
   modelInput.value = settings.model;
   targetLanguageInput.value = settings.targetLanguage;
+  displayModeInput.value = settings.displayMode;
+  rubyPositionInput.value = settings.rubyPosition;
+  updateRubyControls();
+}
+
+function updateRubyControls() {
+  rubyPositionInput.disabled = displayModeInput.value !== "ruby";
 }
 
 async function updateStorageSummary() {
@@ -42,7 +51,9 @@ form.addEventListener("submit", async (event) => {
       apiKey: apiKeyInput.value.trim(),
       baseUrl,
       model: modelInput.value.trim(),
-      targetLanguage: targetLanguageInput.value.trim()
+      targetLanguage: targetLanguageInput.value.trim(),
+      displayMode: displayModeInput.value,
+      rubyPosition: rubyPositionInput.value
     });
     baseUrlInput.value = baseUrl;
     saveStatus.textContent = "设置已保存在本机";
@@ -52,6 +63,8 @@ form.addEventListener("submit", async (event) => {
     saveStatus.dataset.kind = "error";
   }
 });
+
+displayModeInput.addEventListener("change", updateRubyControls);
 
 document.querySelector("#clear-cache").addEventListener("click", async () => {
   await chrome.storage.local.set({ translationCache: [] });
@@ -64,4 +77,3 @@ document.querySelector("#clear-glossaries").addEventListener("click", async () =
 });
 
 await Promise.all([loadSettings(), updateStorageSummary()]);
-

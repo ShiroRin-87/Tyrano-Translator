@@ -40,6 +40,23 @@
           </label>
         </div>
 
+        <div class="grid">
+          <label>
+            <span>显示模式</span>
+            <select id="display-mode" name="displayMode">
+              <option value="translation">纯译文（覆盖原文）</option>
+              <option value="ruby">Ruby 对照（保留原文）</option>
+            </select>
+          </label>
+          <label id="ruby-position-label">
+            <span>Ruby 译文位置</span>
+            <select id="ruby-position" name="rubyPosition">
+              <option value="over">原文上方</option>
+              <option value="under">原文下方</option>
+            </select>
+          </label>
+        </div>
+
         <label>
           <span>API 基础地址</span>
           <input id="base-url" name="baseUrl" type="url" required>
@@ -64,4 +81,3 @@
     <script type="module" src="options.js"></script>
   </body>
 </html>
-

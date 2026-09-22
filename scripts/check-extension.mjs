@@ -6,6 +6,11 @@ if (manifest.manifest_version !== 3) {
   throw new Error("manifest.json 必须使用 Manifest V3");
 }
 
+const mainWorldHook = manifest.content_scripts?.find((entry) => entry.world === "MAIN");
+if (!mainWorldHook?.js?.includes("src/page/engine-hook.js")) {
+  throw new Error("manifest.json 缺少页面主执行环境的 Tyrano 挂钩");
+}
+
 const requiredEntries = [
   manifest.background?.service_worker,
   manifest.action?.default_popup,
@@ -20,4 +25,3 @@ await Promise.all(
 );
 
 console.log(`Extension manifest is valid; checked ${requiredEntries.length} entry files.`);
-

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  DEFAULT_SETTINGS,
   buildTranslationRequest,
   extractResponseText,
   findCachedTranslation,
@@ -15,6 +16,11 @@ const settings = {
   model: "test-model",
   targetLanguage: "简体中文"
 };
+
+test("default display mode replaces source text", () => {
+  assert.equal(DEFAULT_SETTINGS.displayMode, "translation");
+  assert.equal(DEFAULT_SETTINGS.rubyPosition, "over");
+});
 
 test("buildTranslationRequest uses Responses structured output without storage", () => {
   const request = buildTranslationRequest({ text: "こんにちは", settings, glossary: [] });
@@ -56,4 +62,3 @@ test("cache match includes model and target language", () => {
 test("game key uses the game directory rather than the whole page URL", () => {
   assert.equal(gameKeyFromUrl("https://games.example/title-a/index.html?save=1"), "https://games.example/title-a/");
 });
-

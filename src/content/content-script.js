@@ -1,4 +1,7 @@
 (() => {
+  const REQUEST_EVENT = "tyrano-translator:translate-request";
+  const RESPONSE_EVENT = "tyrano-translator:translate-response";
+  const READY_EVENT = "tyrano-translator:engine-ready";
   const ROOT_SELECTOR = "#tyrano_base, .tyrano_base";
   const TEXT_SELECTOR = [
     ".message_inner",
@@ -13,6 +16,50 @@
   const timers = new WeakMap();
   const requestVersions = new WeakMap();
   const { normalizeText, shouldTranslate } = globalThis.TyranoTextCore;
+  let engineHookActive = document.documentElement.dataset.tyranoTranslatorEngineHook === "active";
+
+  document.addEventListener(READY_EVENT, () => {
+    engineHookActive = true;
+    document.documentElement.dataset.tyranoTranslatorEngineHook = "active";
+  });
+
+  document.addEventListener(REQUEST_EVENT, async (event) => {
+    const detail = event.detail;
+    if (
+      !detail ||
+      typeof detail.id !== "string" ||
+      typeof detail.text !== "string" ||
+      !shouldTranslate(detail.text) ||
+      !document.querySelector(ROOT_SELECTOR)
+    ) {
+      return;
+    }
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: "TYRANO_TRANSLATE_TEXT",
+        payload: { text: detail.text, pageUrl: detail.pageUrl }
+      });
+      document.dispatchEvent(
+        new CustomEvent(RESPONSE_EVENT, {
+          detail: {
+            id: detail.id,
+            ok: Boolean(response?.translation),
+            translation: response?.translation,
+            displayMode: response?.displayMode,
+            rubyPosition: response?.rubyPosition,
+            error: response?.error
+          }
+        })
+      );
+    } catch (error) {
+      document.dispatchEvent(
+        new CustomEvent(RESPONSE_EVENT, {
+          detail: { id: detail.id, ok: false, error: error instanceof Error ? error.message : String(error) }
+        })
+      );
+    }
+  });
 
   function sourceText(element) {
     const clone = element.cloneNode(true);
@@ -20,8 +67,21 @@
     return normalizeText(clone.textContent);
   }
 
-  function renderTranslation(element, source, translation) {
+  async function renderTranslation(element, source, translation) {
     if (sourceText(element) !== source) return;
+
+    const { displayMode = "translation", rubyPosition = "over" } = await chrome.storage.local.get([
+      "displayMode",
+      "rubyPosition"
+    ]);
+
+    if (displayMode === "translation") {
+      element.textContent = normalizeText(translation);
+      element.dataset.tyranoTranslatorSource = source;
+      element.dataset.tyranoTranslatorRendered = normalizeText(translation);
+      element.dataset.tyranoTranslatorState = "translated";
+      return;
+    }
 
     let output = element.querySelector(`:scope > [${OUTPUT_ATTRIBUTE}]`);
     if (!output) {
@@ -31,13 +91,20 @@
       element.append(output);
     }
     output.textContent = normalizeText(translation);
+    output.dataset.position = rubyPosition === "under" ? "under" : "over";
     element.dataset.tyranoTranslatorSource = source;
   }
 
   async function translateElement(element) {
     if (!element.isConnected) return;
     const source = sourceText(element);
-    if (!shouldTranslate(source) || element.dataset.tyranoTranslatorSource === source) return;
+    if (
+      !shouldTranslate(source) ||
+      element.dataset.tyranoTranslatorSource === source ||
+      element.dataset.tyranoTranslatorRendered === source
+    ) {
+      return;
+    }
 
     const version = (requestVersions.get(element) ?? 0) + 1;
     requestVersions.set(element, version);
@@ -52,7 +119,7 @@
       if (requestVersions.get(element) !== version) return;
       if (response?.error) throw new Error(response.error);
       if (!response?.translation) throw new Error("翻译服务没有返回译文");
-      renderTranslation(element, source, response.translation);
+      await renderTranslation(element, source, response.translation);
       element.dataset.tyranoTranslatorState = "translated";
     } catch (error) {
       element.dataset.tyranoTranslatorState = "error";
@@ -62,6 +129,12 @@
 
   function schedule(element) {
     if (!(element instanceof Element) || !element.matches(TEXT_SELECTOR)) return;
+    if (
+      engineHookActive &&
+      element.matches(".message_inner, .vchat-text, .fuki_box .text")
+    ) {
+      return;
+    }
     clearTimeout(timers.get(element));
     timers.set(element, setTimeout(() => translateElement(element), SETTLE_DELAY_MS));
   }
