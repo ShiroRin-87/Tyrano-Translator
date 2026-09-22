@@ -1,9 +1,10 @@
 {
   "name": "tyrano-translator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build-extension.mjs",
     "check": "node scripts/check-extension.mjs",
     "test": "node --test"
   },
@@ -11,4 +12,3 @@
     "node": ">=20"
   }
 }
-
