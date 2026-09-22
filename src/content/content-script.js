@@ -49,7 +49,9 @@
         payload: { text: source, pageUrl: location.href }
       });
 
-      if (requestVersions.get(element) !== version || !response?.translation) return;
+      if (requestVersions.get(element) !== version) return;
+      if (response?.error) throw new Error(response.error);
+      if (!response?.translation) throw new Error("翻译服务没有返回译文");
       renderTranslation(element, source, response.translation);
       element.dataset.tyranoTranslatorState = "translated";
     } catch (error) {
