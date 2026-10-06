@@ -60,6 +60,11 @@ h2 {
   font-size: 18px;
 }
 
+h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
 .intro,
 small,
 #storage-summary {
@@ -126,6 +131,48 @@ input:focus {
   gap: 16px;
 }
 
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.feature-card {
+  padding: 16px;
+  border: 1px solid #3d444d;
+  border-radius: 12px;
+  background: #0d1117;
+}
+
+.feature-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.feature-card p {
+  min-height: 60px;
+  margin: 12px 0 16px;
+  color: #9da7b3;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.status-badge {
+  flex: none;
+  padding: 4px 8px;
+  border: 1px solid #554b2b;
+  border-radius: 999px;
+  color: #facc15;
+  font-size: 11px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 button {
   padding: 10px 15px;
   border: 1px solid #4b5563;
@@ -176,5 +223,13 @@ button:hover {
   .grid {
     grid-template-columns: 1fr;
     gap: 0;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card p {
+    min-height: 0;
   }
 }

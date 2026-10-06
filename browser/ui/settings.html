@@ -37,6 +37,21 @@
         </div>
         <div class="actions"><button class="primary" type="submit">保存设置</button><output id="status"></output></div>
       </form>
+      <section aria-labelledby="billing-title">
+        <h2 id="billing-title">充值与 API 获取</h2>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-heading"><h3>平台翻译额度</h3><span class="status-badge">即将开放</span></div>
+            <p>后续可充值并使用平台托管的翻译 API。当前尚未接入账户、支付或额度服务，不会创建订单或扣款。</p>
+            <button type="button" disabled>平台充值暂未开放</button>
+          </article>
+          <article class="feature-card">
+            <div class="feature-heading"><h3>自有 API 服务商充值</h3><span class="status-badge">入口待配置</span></div>
+            <p>继续使用上方填写的个人 API Key。服务商充值入口待确定；目前请前往对应服务商官网管理账户余额。</p>
+            <button type="button" disabled>服务商充值入口暂不可用</button>
+          </article>
+        </div>
+      </section>
       <section>
         <h2>本地翻译数据</h2>
         <p id="summary"></p>
@@ -49,4 +64,3 @@
     <script src="settings.js"></script>
   </body>
 </html>
-
