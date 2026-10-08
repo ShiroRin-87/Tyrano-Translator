@@ -4,60 +4,87 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'">
-    <title>翻译设置</title>
+    <title>翻译设置 · Tyrano Translator</title>
     <link rel="stylesheet" href="settings.css">
   </head>
   <body>
     <main>
-      <h1>翻译设置</h1>
-      <p class="intro">配置只保存在这台电脑。游戏页面无法读取 API Key。</p>
+      <header class="page-header">
+        <h1>翻译设置</h1>
+        <span class="edition">Tyrano Translator / 独立浏览器</span>
+      </header>
+      <p class="intro">API Key 仅保存在本机。</p>
+
       <form id="settings-form">
-        <label class="toggle"><span>启用实时翻译</span><input id="enabled" type="checkbox"></label>
-        <label><span>API Key</span><input id="api-key" type="password" autocomplete="off" required></label>
-        <div class="grid">
-          <label><span>目标语言</span><input id="target-language" type="text" required></label>
-          <label><span>模型</span><input id="model" type="text" required></label>
-        </div>
-        <label><span>API 基础地址</span><input id="base-url" type="url" required></label>
+        <label class="toggle-row">
+          <input id="enabled" type="checkbox">
+          <span>启用实时翻译</span>
+        </label>
+        <label>
+          <span>API Key</span>
+          <input id="api-key" type="password" autocomplete="off" placeholder="填写你的 API Key" required>
+        </label>
         <div class="grid">
           <label>
-            <span>显示模式</span>
+            <span>模型</span>
+            <input id="model" type="text" required>
+          </label>
+          <label>
+            <span>目标语言</span>
+            <input id="target-language" type="text" required>
+          </label>
+        </div>
+        <label>
+          <span>API 地址</span>
+          <input id="base-url" type="url" required>
+          <small>填写服务商的基础地址，兼容服务需支持 /responses。</small>
+        </label>
+        <div class="grid">
+          <label>
+            <span>显示方式</span>
             <select id="display-mode">
-              <option value="translation">纯译文（覆盖原文）</option>
-              <option value="ruby">Ruby 对照</option>
+              <option value="translation">仅译文</option>
+              <option value="ruby">原文 + 译文</option>
             </select>
           </label>
           <label>
-            <span>Ruby 位置</span>
+            <span>译文位置（对照模式）</span>
             <select id="ruby-position">
               <option value="over">原文上方</option>
               <option value="under">原文下方</option>
             </select>
           </label>
         </div>
-        <div class="actions"><button class="primary" type="submit">保存设置</button><output id="status"></output></div>
+        <div class="actions">
+          <button class="primary" type="submit">保存</button>
+          <output id="status" role="status" aria-live="polite"></output>
+        </div>
       </form>
+
       <section aria-labelledby="billing-title">
-        <h2 id="billing-title">充值与 API 获取</h2>
-        <div class="feature-grid">
-          <article class="feature-card">
-            <div class="feature-heading"><h3>平台翻译额度</h3><span class="status-badge">即将开放</span></div>
-            <p>后续可充值并使用平台托管的翻译 API。当前尚未接入账户、支付或额度服务，不会创建订单或扣款。</p>
-            <button type="button" disabled>平台充值暂未开放</button>
-          </article>
-          <article class="feature-card">
-            <div class="feature-heading"><h3>自有 API 服务商充值</h3><span class="status-badge">入口待配置</span></div>
-            <p>继续使用上方填写的个人 API Key。服务商充值入口待确定；目前请前往对应服务商官网管理账户余额。</p>
-            <button type="button" disabled>服务商充值入口暂不可用</button>
-          </article>
+        <h2 id="billing-title">充值</h2>
+        <div class="service-row">
+          <div>
+            <h3>平台翻译额度</h3>
+            <p>暂未开放，目前请使用自己的 API Key。</p>
+          </div>
+          <button type="button" disabled>平台充值</button>
+        </div>
+        <div class="service-row">
+          <div>
+            <h3>API 服务商</h3>
+            <p>入口待配置，可先到服务商官网充值。</p>
+          </div>
+          <button type="button" disabled>服务商充值</button>
         </div>
       </section>
-      <section>
-        <h2>本地翻译数据</h2>
-        <p id="summary"></p>
+
+      <section aria-labelledby="local-data-title">
+        <h2 id="local-data-title">本地数据</h2>
+        <p id="summary" class="data-summary" role="status">正在读取…</p>
         <div class="actions">
           <button id="clear-cache" type="button">清空译文缓存</button>
-          <button id="clear-glossaries" type="button">清空 AI 术语表</button>
+          <button id="clear-glossaries" type="button">清空术语表</button>
         </div>
       </section>
     </main>
