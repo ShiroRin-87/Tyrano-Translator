@@ -384,3 +384,14 @@
 - 签名状态：未签名。
 - 验证：浏览器静态检查与 26 项测试通过；ASAR 中的设置页、主入口、翻译核心和预加载脚本与源码逐字节一致；包内版本号为 0.4.1，交付安装包哈希与构建产物一致。
 - 存储：本次构建、临时目录和构建缓存位于 `E:\ChatGPT\work\tyrano-package-0.4.1`，交付文件位于 E 盘输出目录；旧安装包保持原样。本次没有启动新打包客户端。
+
+## Step 025 — 发布 GitHub Release v0.4.1
+
+- 日期：2026-10-09
+- 状态：完成，正式发布（非草稿、非预发布）
+- 地址：[v0.4.1](https://github.com/ShiroRin-87/Tyrano-Translator/releases/tag/v0.4.1)。
+- 标签：`v0.4.1`，指向构建版本提交 `12f1802`；版本提交与标签已推送。
+- 附件：Windows x64 安装包、免安装 ZIP、`SHA256SUMS.txt`。
+- 免安装 ZIP：162,898,949 字节，含完整 `win-unpacked` 目录及使用说明。
+- 验证：ZIP 内应用归档与免安装目录一致；GitHub API 确认三个附件均已上传，安装包及 ZIP 的远程校验值与本地文件一致。
+- 存储：发布说明位于 `E:\ChatGPT\work\tyrano-release-0.4.1`，发布附件的本地副本位于 `E:\ChatGPT\outputs\tyrano-browser-0.4.1`。

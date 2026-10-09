@@ -35,6 +35,8 @@ npm run browser:dist
 
 安装包位于 `release-browser/Tyrano-Translator-Browser-0.4.1-Setup.exe`。本次交付的安装包及免安装目录位于 `E:\ChatGPT\outputs\tyrano-browser-0.4.1`。首次运行后点击工具栏中的“翻译设置”，只需填写自己的 API Key。项目的构建命令不会自动启动浏览器；只有 `npm run browser:start` 会打开窗口。
 
+安装版及免安装 ZIP 也可从 [GitHub Release v0.4.1](https://github.com/ShiroRin-87/Tyrano-Translator/releases/tag/v0.4.1) 下载。
+
 ## 扩展本地安装
 
 1. 安装 Node.js 22.12 或更高版本。
